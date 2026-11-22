@@ -10,10 +10,22 @@ if (!file) {
   const runtime = await createPromelaParser();
   try {
     const tree = runtime.parse(source);
-    console.log(JSON.stringify({file, syntaxErrors: tree.rootNode.hasError,
-      rootType: tree.rootNode.type, topLevelCount: tree.rootNode.namedChildCount}, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          file,
+          syntaxErrors: tree.rootNode.hasError,
+          rootType: tree.rootNode.type,
+          topLevelCount: tree.rootNode.namedChildCount,
+        },
+        null,
+        2,
+      ),
+    );
     if (process.argv.includes('--tree')) console.log(tree.rootNode.toString());
     if (tree.rootNode.hasError) process.exitCode = 1;
     tree.delete();
-  } finally { runtime.close(); }
+  } finally {
+    runtime.close();
+  }
 }

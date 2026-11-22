@@ -16,19 +16,21 @@ import { assertSyntax } from './support/syntax-assertions.js';
 type AuditCase = { name: string; source: string; expectedValid: boolean };
 type Gap = { name: string; source: string; reason: string };
 const root = process.cwd();
-const allCases = JSON.parse(readFileSync(resolve(root, 'fixtures/audit-cases.json'), 'utf8')) as AuditCase[];
+const allCases = JSON.parse(
+  readFileSync(resolve(root, 'fixtures/audit-cases.json'), 'utf8'),
+) as AuditCase[];
 const gaps = JSON.parse(readFileSync(resolve(root, 'fixtures/known-gaps.json'), 'utf8')) as Gap[];
-const knownGaps = new Set(gaps.map(gap => gap.name));
+const knownGaps = new Set(gaps.map((gap) => gap.name));
 const expectedNodes: Record<string, string> = {
   'global-variable': 'one_decl',
   'proctype-with-argument': 'proc',
-  'channels': 'ch_init',
+  channels: 'ch_init',
   'ltl-property': 'ltl',
   'user-defined-type': 'utype',
   'goto-label': 'labeled_step',
   'inline-definition': 'inline_definition',
-  'preprocessor': 'preprocessor_directive',
-  'unsigned': 'unsigned_decl',
+  preprocessor: 'preprocessor_directive',
+  unsigned: 'unsigned_decl',
   'guarded-option-assignment': 'option',
   'ltl-temporal-implication': 'ltl_expr',
   'labeled-statement-and-goto': 'labeled_step',
@@ -39,10 +41,11 @@ const expectedNodes: Record<string, string> = {
 const runtimePromise = createPromelaParser();
 after(async () => (await runtimePromise).close());
 
-const positive = allCases.filter(entry => entry.expectedValid && !knownGaps.has(entry.name));
+const positive = allCases.filter((entry) => entry.expectedValid && !knownGaps.has(entry.name));
 test('conformance fixtures are unique and every supported case has an AST contract', () => {
-  assert.equal(new Set(allCases.map(entry => entry.name)).size, allCases.length);
-  for (const entry of positive) assert.ok(expectedNodes[entry.name], `Missing AST contract: ${entry.name}`);
+  assert.equal(new Set(allCases.map((entry) => entry.name)).size, allCases.length);
+  for (const entry of positive)
+    assert.ok(expectedNodes[entry.name], `Missing AST contract: ${entry.name}`);
   for (const gap of gaps) assert.ok(gap.reason, `Undocumented grammar gap: ${gap.name}`);
 });
 
@@ -53,8 +56,10 @@ for (const entry of positive) {
     try {
       assertSyntax(tree.rootNode, 'valid', entry.name);
       const required = expectedNodes[entry.name]!;
-      assert.ok(tree.rootNode.descendantsOfType(required).length > 0,
-        `Expected ${required} in AST: ${tree.rootNode.toString()}`);
+      assert.ok(
+        tree.rootNode.descendantsOfType(required).length > 0,
+        `Expected ${required} in AST: ${tree.rootNode.toString()}`,
+      );
     } finally {
       tree.delete();
     }

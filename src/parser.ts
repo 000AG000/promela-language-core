@@ -22,7 +22,7 @@ export async function createPromelaParser(projectRoot?: string): Promise<Promela
     : fileURLToPath(new URL('../../assets/tree-sitter-promela.wasm', import.meta.url));
   if (!existsSync(wasmPath)) throw new Error(`No language WASM at ${wasmPath}. Run npm run setup.`);
   // On Node, Parser.init() resolves the core tree-sitter.wasm from the installed package.
-  runtimePromise ??= Parser.init().catch(error => {
+  runtimePromise ??= Parser.init().catch((error) => {
     runtimePromise = undefined;
     throw error;
   });
@@ -38,6 +38,8 @@ export async function createPromelaParser(projectRoot?: string): Promise<Promela
       if (!tree) throw new Error('Tree-sitter returned no syntax tree');
       return tree;
     },
-    close() { parser.delete(); },
+    close() {
+      parser.delete();
+    },
   };
 }

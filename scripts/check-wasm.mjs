@@ -7,7 +7,8 @@ const stamp = resolve(root, 'assets/tree-sitter-promela.build.sha256');
 try {
   const expected = readFileSync(stamp, 'utf8').trim();
   const actual = artifactSignature(root);
-  if (expected !== actual) throw new Error('Build fingerprint differs from grammar and WASM inputs');
+  if (expected !== actual)
+    throw new Error('Build fingerprint differs from grammar and WASM inputs');
   console.log('WASM artifact fingerprint matches current grammar and generated parser.');
 } catch (error) {
   console.error(`WASM artifact is missing or stale: ${error.message}`);

@@ -1,7 +1,17 @@
 import type { Node, Tree } from 'web-tree-sitter';
 
 /** Prototype symbol resolver. Ranges are zero-based Tree-sitter positions. */
-export type SymbolKind = 'variable' | 'parameter' | 'proctype' | 'typedef' | 'field' | 'mtype' | 'label' | 'ltl' | 'inline' | 'macro';
+export type SymbolKind =
+  | 'variable'
+  | 'parameter'
+  | 'proctype'
+  | 'typedef'
+  | 'field'
+  | 'mtype'
+  | 'label'
+  | 'ltl'
+  | 'inline'
+  | 'macro';
 export interface Definition {
   name: string;
   kind: SymbolKind;
@@ -17,10 +27,10 @@ export interface Definition {
 }
 
 function first(node: Node, type: string): Node | undefined {
-  return node.namedChildren.find(child => child.type === type);
+  return node.namedChildren.find((child) => child.type === type);
 }
 function children(node: Node, type: string): Node[] {
-  return node.namedChildren.filter(child => child.type === type);
+  return node.namedChildren.filter((child) => child.type === type);
 }
 function ancestor(node: Node, type: string): Node | null {
   let n: Node | null = node;
@@ -29,24 +39,38 @@ function ancestor(node: Node, type: string): Node | null {
 }
 function nearestScope(node: Node): string {
   for (let p = node.parent; p; p = p.parent) {
-    if (p.type === 'proc' || p.type === 'init' || p.type === 'claim' || p.type === 'inline_definition') {
+    if (
+      p.type === 'proc' ||
+      p.type === 'init' ||
+      p.type === 'claim' ||
+      p.type === 'inline_definition'
+    ) {
       return `${p.type}:${p.startIndex}`;
     }
   }
   return 'global';
 }
-function declarationContext(node: Node): {scope: string; kind: SymbolKind; ownerType?: string} {
+function declarationContext(node: Node): { scope: string; kind: SymbolKind; ownerType?: string } {
   const typedef = ancestor(node, 'utype');
-  if (typedef) return {scope: 'type', kind: 'field', ownerType: first(typedef, 'uname')?.text};
+  if (typedef) return { scope: 'type', kind: 'field', ownerType: first(typedef, 'uname')?.text };
   const proc = ancestor(node, 'proc');
-  if (proc && ancestor(node, 'decl')) return {scope: nearestScope(node), kind: 'parameter'};
-  return {scope: nearestScope(node), kind: 'variable'};
+  if (proc && ancestor(node, 'decl')) return { scope: nearestScope(node), kind: 'parameter' };
+  return { scope: nearestScope(node), kind: 'variable' };
 }
-function definition(node: Node, kind: SymbolKind, scope: string, extras: Partial<Definition> = {}): Definition {
+function definition(
+  node: Node,
+  kind: SymbolKind,
+  scope: string,
+  extras: Partial<Definition> = {},
+): Definition {
   return {
-    name: node.text, kind, scope,
-    row: node.startPosition.row, column: node.startPosition.column,
-    endColumn: node.endPosition.column, startIndex: node.startIndex,
+    name: node.text,
+    kind,
+    scope,
+    row: node.startPosition.row,
+    column: node.startPosition.column,
+    endColumn: node.endPosition.column,
+    startIndex: node.startIndex,
     ...extras,
   };
 }
@@ -93,8 +117,11 @@ export function indexDefinitions(tree: Tree): Definition[] {
           const name = match[1]!;
           const offset = match[0].lastIndexOf(name);
           out.push({
-            name, kind: 'macro', scope: 'global',
-            row: node.startPosition.row, column: node.startPosition.column + offset,
+            name,
+            kind: 'macro',
+            scope: 'global',
+            row: node.startPosition.row,
+            column: node.startPosition.column + offset,
             endColumn: node.startPosition.column + offset + name.length,
             startIndex: node.startIndex + offset,
           });
@@ -112,22 +139,27 @@ export function indexDefinitions(tree: Tree): Definition[] {
         const ctx = declarationContext(node);
         // Custom types are aliased with a string (`alias($.uname, 'type')`),
         // so they are anonymous children and absent from `namedChildren`.
-        const declaredType = node.children.find(child => child.type === 'type');
+        const declaredType = node.children.find((child) => child.type === 'type');
         const varList = first(node, 'var_list');
         if (varList) {
           for (const ivar of children(varList, 'ivar')) {
             const vardcl = first(ivar, 'vardcl');
             const name = vardcl && first(vardcl, 'uname');
-            if (name) out.push(definition(name, ctx.kind, ctx.scope, {
-              typeName: declaredType?.text, ownerType: ctx.ownerType,
-            }));
+            if (name)
+              out.push(
+                definition(name, ctx.kind, ctx.scope, {
+                  typeName: declaredType?.text,
+                  ownerType: ctx.ownerType,
+                }),
+              );
           }
         }
         if (declaredType?.text === 'mtype') {
           const nlst = first(node, 'nlst');
-          if (nlst) for (const name of children(nlst, 'uname')) {
-            out.push(definition(name, 'mtype', 'global'));
-          }
+          if (nlst)
+            for (const name of children(nlst, 'uname')) {
+              out.push(definition(name, 'mtype', 'global'));
+            }
         }
         break;
       }
@@ -142,33 +174,58 @@ export function indexDefinitions(tree: Tree): Definition[] {
     for (const child of node.namedChildren) visit(child);
   };
   visit(tree.rootNode);
-  return out.filter((entry, index, arr) =>
-    arr.findIndex(other => other.startIndex === entry.startIndex && other.kind === entry.kind) === index);
+  return out.filter(
+    (entry, index, arr) =>
+      arr.findIndex(
+        (other) => other.startIndex === entry.startIndex && other.kind === entry.kind,
+      ) === index,
+  );
 }
 
 function isDeclaration(target: Node): boolean {
   const parent = target.parent;
   if (!parent) return false;
-  if (parent.type === 'proc' || parent.type === 'utype' || parent.type === 'ltl' || parent.type === 'inline_definition' || parent.type === 'inline_parameters') return true;
-  if (parent.type === 'vardcl' && first(parent, 'uname')?.startIndex === target.startIndex) return true;
-  if (parent.type === 'unsigned_item' && parent.childForFieldName('name')?.startIndex === target.startIndex) return true;
+  if (
+    parent.type === 'proc' ||
+    parent.type === 'utype' ||
+    parent.type === 'ltl' ||
+    parent.type === 'inline_definition' ||
+    parent.type === 'inline_parameters'
+  )
+    return true;
+  if (parent.type === 'vardcl' && first(parent, 'uname')?.startIndex === target.startIndex)
+    return true;
+  if (
+    parent.type === 'unsigned_item' &&
+    parent.childForFieldName('name')?.startIndex === target.startIndex
+  )
+    return true;
   if (parent.type === 'nlst') return true;
-  if (parent.type === 'labeled_step' && parent.childForFieldName('name')?.startIndex === target.startIndex) return true;
+  if (
+    parent.type === 'labeled_step' &&
+    parent.childForFieldName('name')?.startIndex === target.startIndex
+  )
+    return true;
   return false;
 }
 
-function choose(symbols: Definition[], name: string, kind: SymbolKind, scope: string): Definition | undefined {
-  return symbols.find(s => s.name === name && s.kind === kind && s.scope === scope);
+function choose(
+  symbols: Definition[],
+  name: string,
+  kind: SymbolKind,
+  scope: string,
+): Definition | undefined {
+  return symbols.find((s) => s.name === name && s.kind === kind && s.scope === scope);
 }
 
 /** Resolve a cursor to a declaration, preferring parameters/process-local variables. */
 export function definitionAt(tree: Tree, row: number, column: number): Definition | undefined {
-  const node = tree.rootNode.descendantForPosition({row, column});
+  const node = tree.rootNode.descendantForPosition({ row, column });
   if (!node || !['uname', 'type'].includes(node.type)) return undefined;
   const defs = indexDefinitions(tree);
   const localScope = nearestScope(node);
   const name = node.text;
-  const own = defs.find(d => d.startIndex === node.startIndex);
+  const own = defs.find((d) => d.startIndex === node.startIndex);
   if (own && isDeclaration(node)) return own;
 
   if (ancestor(node, 'goto')) return choose(defs, name, 'label', localScope);
@@ -185,39 +242,50 @@ export function definitionAt(tree: Tree, row: number, column: number): Definitio
   const cmpnd = ancestor(node, 'cmpnd');
   if (cmpnd) {
     const fields = children(cmpnd, 'pfld');
-    const current = fields.findIndex(f => node.startIndex >= f.startIndex && node.endIndex <= f.endIndex);
+    const current = fields.findIndex(
+      (f) => node.startIndex >= f.startIndex && node.endIndex <= f.endIndex,
+    );
     if (current > 0) {
       const baseName = first(fields[0]!, 'uname')?.text;
-      const base = baseName ? (
-        choose(defs, baseName, 'variable', localScope) ??
-        choose(defs, baseName, 'parameter', localScope) ??
-        choose(defs, baseName, 'variable', 'global')
-      ) : undefined;
+      const base = baseName
+        ? (choose(defs, baseName, 'variable', localScope) ??
+          choose(defs, baseName, 'parameter', localScope) ??
+          choose(defs, baseName, 'variable', 'global'))
+        : undefined;
       if (current === 1 && base?.typeName) {
-        return defs.find(d => d.kind === 'field' && d.ownerType === base.typeName && d.name === name);
+        return defs.find(
+          (d) => d.kind === 'field' && d.ownerType === base.typeName && d.name === name,
+        );
       }
       // Deeper struct member chains need a full type checker.
       return undefined;
     }
   }
   if (own) return own;
-  return choose(defs, name, 'variable', localScope)
-    ?? choose(defs, name, 'parameter', localScope)
-    ?? choose(defs, name, 'variable', 'global')
-    ?? choose(defs, name, 'mtype', 'global')
-    ?? choose(defs, name, 'typedef', 'global')
-    ?? choose(defs, name, 'proctype', 'global')
-    ?? choose(defs, name, 'macro', 'global');
+  return (
+    choose(defs, name, 'variable', localScope) ??
+    choose(defs, name, 'parameter', localScope) ??
+    choose(defs, name, 'variable', 'global') ??
+    choose(defs, name, 'mtype', 'global') ??
+    choose(defs, name, 'typedef', 'global') ??
+    choose(defs, name, 'proctype', 'global') ??
+    choose(defs, name, 'macro', 'global')
+  );
 }
 
 /** Convert a searched substring to a cursor position; used in tests and examples. */
-export function positionOf(source: string, needle: string, occurrence = 1): {row: number; column: number} {
+export function positionOf(
+  source: string,
+  needle: string,
+  occurrence = 1,
+): { row: number; column: number } {
   let index = -1;
   for (let i = 0; i < occurrence; i++) {
     index = source.indexOf(needle, index + 1);
-    if (index < 0) throw new Error(`Unable to find occurrence ${occurrence} of ${JSON.stringify(needle)}`);
+    if (index < 0)
+      throw new Error(`Unable to find occurrence ${occurrence} of ${JSON.stringify(needle)}`);
   }
   const before = source.slice(0, index);
   const lines = before.split('\n');
-  return {row: lines.length - 1, column: lines.at(-1)!.length};
+  return { row: lines.length - 1, column: lines.at(-1)!.length };
 }

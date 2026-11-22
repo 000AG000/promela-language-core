@@ -17,7 +17,10 @@ export function assertSyntax(
     assert.equal(node.type, 'program', `${label}: expected program root; got ${node.type}`);
     assert.equal(node.hasError, false, `${label}: unexpected syntax error: ${node.toString()}`);
   } else {
-    assert.equal(node.hasError, true,
-      `${label}: malformed source was accepted without a syntax error: ${node.toString()}`);
+    assert.equal(
+      node.hasError,
+      true,
+      `${label}: malformed source was accepted without a syntax error: ${node.toString()}`,
+    );
   }
 }

@@ -9,10 +9,14 @@ const wasm = resolve(root, 'assets/tree-sitter-promela.wasm');
 if (!existsSync(resolve(root, 'grammar/src/parser.c'))) {
   throw new Error('Missing generated parser. Run npm run generate first.');
 }
-mkdirSync(resolve(root, 'assets'), {recursive: true});
+mkdirSync(resolve(root, 'assets'), { recursive: true });
 execFileSync(cli, ['build', '--wasm', '--output', wasm], {
-  cwd: resolve(root, 'grammar'), stdio: 'inherit',
+  cwd: resolve(root, 'grammar'),
+  stdio: 'inherit',
 });
-if (!existsSync(wasm)) throw new Error('WASM build returned without producing '+wasm);
-writeFileSync(resolve(root, 'assets/tree-sitter-promela.build.sha256'), artifactSignature(root) + '\n');
+if (!existsSync(wasm)) throw new Error('WASM build returned without producing ' + wasm);
+writeFileSync(
+  resolve(root, 'assets/tree-sitter-promela.build.sha256'),
+  artifactSignature(root) + '\n',
+);
 console.log(`Built ${wasm}`);

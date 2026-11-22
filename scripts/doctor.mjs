@@ -18,7 +18,11 @@ function checkFile(label, path, required = true) {
   report(label, present ? 'ok' : required ? 'fail' : 'warn', present ? '' : `missing ${path}`);
 }
 const [major, minor] = process.versions.node.split('.').map(Number);
-report('Node.js >= 20.11', major > 20 || (major === 20 && minor >= 11) ? 'ok' : 'fail', process.version);
+report(
+  'Node.js >= 20.11',
+  major > 20 || (major === 20 && minor >= 11) ? 'ok' : 'fail',
+  process.version,
+);
 checkFile('Maintained grammar', 'grammar/grammar.js');
 checkFile('Original MIT license', 'grammar/LICENSE');
 checkFile('Maintainer attribution', 'LICENSE');
@@ -42,5 +46,7 @@ if (!existsSync(lockPath)) {
   }
 }
 checkFile('Built WASM (optional before first build)', 'assets/tree-sitter-promela.wasm', false);
-console.log(`Project ${manifest.version} | Node ${process.version} | ${errors} errors, ${warnings} warnings`);
+console.log(
+  `Project ${manifest.version} | Node ${process.version} | ${errors} errors, ${warnings} warnings`,
+);
 if (errors) process.exitCode = 1;

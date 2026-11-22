@@ -5,8 +5,10 @@ export function lockfileProblems(manifest, lock) {
   if (lock.lockfileVersion !== 3) errors.push('Expected npm lockfileVersion 3');
   const root = lock.packages?.[''];
   if (!root) return [...errors, 'Missing root packages[""] entry in lockfile'];
-  if (root.name !== manifest.name) errors.push('Lockfile root package name differs from package.json');
-  if (root.version !== manifest.version) errors.push('Lockfile root version differs from package.json');
+  if (root.name !== manifest.name)
+    errors.push('Lockfile root package name differs from package.json');
+  if (root.version !== manifest.version)
+    errors.push('Lockfile root version differs from package.json');
   for (const group of ['dependencies', 'devDependencies', 'optionalDependencies']) {
     const actual = manifest[group] ?? {};
     const locked = root[group] ?? {};

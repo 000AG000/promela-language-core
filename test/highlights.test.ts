@@ -29,13 +29,18 @@ test('highlights.scm captures named break and ordinary keyword tokens', () => {
     assert.equal(tree.rootNode.hasError, false, tree.rootNode.toString());
     const query = new Query(runtime.language, source);
     try {
-      const keywords = query.captures(tree.rootNode)
-        .filter(c => c.name === 'keyword')
-        .map(c => ({ text: c.node.text, type: c.node.type }));
-      assert.ok(keywords.some(c => c.text === 'break' && c.type === 'break'),
-        `Named break keyword not captured: ${JSON.stringify(keywords)}`);
-      assert.ok(keywords.some(c => c.text === 'proctype'),
-        `Anonymous proctype keyword not captured: ${JSON.stringify(keywords)}`);
+      const keywords = query
+        .captures(tree.rootNode)
+        .filter((c) => c.name === 'keyword')
+        .map((c) => ({ text: c.node.text, type: c.node.type }));
+      assert.ok(
+        keywords.some((c) => c.text === 'break' && c.type === 'break'),
+        `Named break keyword not captured: ${JSON.stringify(keywords)}`,
+      );
+      assert.ok(
+        keywords.some((c) => c.text === 'proctype'),
+        `Anonymous proctype keyword not captured: ${JSON.stringify(keywords)}`,
+      );
     } finally {
       query.delete();
     }
