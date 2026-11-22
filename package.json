@@ -1,6 +1,6 @@
 {
   "name": "promela-tree-sitter-wasm-lab",
-  "version": "0.3.5.1",
+  "version": "0.3.6",
   "private": true,
   "type": "module",
   "description": "Self-contained ProMeLa Tree-sitter grammar and TypeScript WASM language-service prototype",
@@ -22,7 +22,7 @@
     "test:compiled": "npm run check:wasm && npm run build && node --test dist/test/*.test.js",
     "stage:core": "npm run check:wasm && npm run build && node scripts/stage-core.mjs",
     "release:core": "npm test && node scripts/stage-core.mjs",
-    "check:fast": "npm run check:grammar && tsc --noEmit -p tsconfig.json && node scripts/check-scripts.mjs",
+    "check:fast": "npm run check:grammar && tsc --noEmit -p tsconfig.json && node scripts/check-scripts.mjs && npm run test:tooling",
     "test:grammar": "node scripts/run-corpus.mjs",
     "test:unit": "node --test dist/test/*.test.js",
     "test:package": "npm run stage:core && node scripts/test-package.mjs",
@@ -30,7 +30,13 @@
     "hooks:install": "node scripts/install-hooks.mjs",
     "doctor": "node scripts/doctor.mjs",
     "test:coverage": "npm run build:wasm && npm run build && node --experimental-test-coverage --test dist/test/*.test.js",
-    "test:negative": "npm run check:wasm && npm run build && node --test dist/test/negative.test.js"
+    "test:negative": "npm run check:wasm && npm run build && node --test dist/test/negative.test.js",
+    "lint": "eslint src test scripts --max-warnings=0",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.mjs\"",
+    "format:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.mjs\"",
+    "test:tooling": "node --test test-tools/*.test.mjs",
+    "check:lock": "node scripts/check-lockfile.mjs",
+    "check:quality": "npm run check:fast && npm run lint"
   },
   "dependencies": {
     "web-tree-sitter": "0.27.2"
@@ -38,6 +44,10 @@
   "devDependencies": {
     "@types/node": "22.15.0",
     "tree-sitter-cli": "0.27.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@eslint/js": "9.39.1",
+    "eslint": "9.39.1",
+    "typescript-eslint": "8.46.0",
+    "prettier": "3.6.2"
   }
 }

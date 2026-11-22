@@ -1,0 +1,11 @@
+node_modules/
+dist/
+release/
+assets/
+grammar/
+fixtures/
+integration/
+vendor/
+*.tgz
+*.vsix
+package-lock.json

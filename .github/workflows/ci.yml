@@ -2,6 +2,7 @@ name: Build and test ProMeLa WASM
 on:
   push:
   pull_request:
+
 jobs:
   wasm:
     runs-on: ubuntu-latest
@@ -10,9 +11,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-audit --no-fund
-      - run: npm run setup
+          cache: npm
+      # CI deliberately requires a committed package-lock.json.
+      # Before creating a public repository, run npm install locally, commit
+      # package-lock.json and verify npm ci on a fresh checkout.
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check:lock
+      - run: npm run check:quality
+      - run: npm run test:all
       - run: npm run audit
-      - run: npm run test:package
       - run: npm pack --dry-run ./release/promela-language-core
-      # Publication gate: commit package-lock.json and replace npm install with npm ci.
+      # Prettier is opt-in until the existing source is formatted in a
+      # separate reviewable change; then add 'npm run format:check' here.

@@ -1,5 +1,5 @@
 #!/bin/sh
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-printf '%s\n' '[pre-push] ProMeLa full WASM regression suite'
-npm test
+printf '%s\n' '[pre-push] ProMeLa full WASM + independent package checks'
+npm run test:all

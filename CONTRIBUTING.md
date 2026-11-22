@@ -48,3 +48,11 @@ Do not publish until all steps in `docs/TESTING.md` pass, licensing is reviewed,
 version/provenance are documented, and a separate VS Code consumer actually
 loads the tarball. Production publishing, GitHub setup and VSIX distribution
 are distinct deliberate actions.
+
+## Static analysis and formatting (v0.3.6)
+
+Run `npm run check:quality` before committing. Check `npm run lint` output and
+fix genuine issues. Formatting is opt-in for now (`npm run format:check` /
+`npm run format:write`); schedule the first bulk formatting pass as its own
+reviewable commit. Commit `package-lock.json` after updating dependencies and
+confirm `npm ci` on a clean checkout. See `docs/TOOLING-v0.3.6.md`.

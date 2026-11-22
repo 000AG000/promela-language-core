@@ -13,4 +13,4 @@ try {
 // Explicit opt-in: no hooks are installed automatically by npm install.
 execFileSync('git', ['config', '--local', 'core.hooksPath', 'scripts/hooks'], {cwd: root, stdio: 'inherit'});
 console.log('Installed tracked Git hooks via core.hooksPath=scripts/hooks');
-console.log('pre-commit: npm run check:fast | pre-push: npm test');
+console.log('pre-commit: npm run check:quality | pre-push: npm run test:all');

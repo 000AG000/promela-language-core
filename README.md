@@ -104,3 +104,11 @@ The negative suite tracks one known top-level error-recovery limitation
 as a TODO. See [error recovery](docs/ERROR_RECOVERY.md). Incremental
 repairs are compared against fresh parses rather than a hardcoded AST
 node count. The VS Code sample uses a separate dependency installation.
+
+## Developer tooling (v0.3.6)
+
+See [docs/TOOLING-v0.3.6.md](docs/TOOLING-v0.3.6.md). After applying the
+patch, run `npm install` to update the local lockfile, then
+`npm run doctor -- --strict`, `npm run check:quality`, and `npm run test:all`.
+CI requires a committed `package-lock.json` and uses `npm ci`. Prettier is
+configured but intentionally not enforced until a separate formatting commit.

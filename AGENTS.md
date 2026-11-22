@@ -57,3 +57,13 @@ The upstream baseline is `siraben/tree-sitter-promela` at
 
 Prefer small, reviewable commits. Include negative tests for malformed source,
 and avoid automatic formatting that rewrites unrelated grammar code.
+
+## Tooling and reproducibility (v0.3.6)
+
+- `npm run check:quality` runs static/type checks, tooling unit tests, and ESLint.
+- `npm run test:all` is still mandatory before release and covers the tarball.
+- Generate a real root `package-lock.json` using `npm install`, commit it, and
+  use `npm ci` in CI; do not fabricate registry-resolved integrity values.
+- Avoid bulk formatting in functional patches. The first Prettier formatting
+  pass must be an independent commit; only then enforce `format:check` in CI.
+- Read `docs/TOOLING-v0.3.6.md` before changing tooling or hooks.

@@ -133,3 +133,11 @@ npm run test:package
 `npm run test:package` is a distribution smoke test; it does not run the
 full parser regression suite. Use `npm run test:all` before release.
 There is no automatic npm publish or GitHub push.
+
+## Development-tooling gate (v0.3.6)
+
+`npm run test:tooling` exercises the lockfile metadata validator. `npm run
+check:quality` includes TypeScript/grammar/static checks and ESLint. CI now
+uses `npm ci`, so a real, committed `package-lock.json` is required. The
+Prettier check is opt-in until a separately reviewed initial formatting pass.
+See `docs/TOOLING-v0.3.6.md` for migration commands.
