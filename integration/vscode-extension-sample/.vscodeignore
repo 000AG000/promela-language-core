@@ -5,3 +5,5 @@ src/**
 **/*.map
 node_modules/@types/**
 *.vsix
+test/**
+scripts/**

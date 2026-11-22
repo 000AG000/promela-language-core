@@ -30,9 +30,13 @@
     ]
   },
   "scripts": {
+    "sync:core": "node scripts/sync-core.mjs",
+    "precheck:types": "node scripts/sync-core.mjs --check",
+    "prebuild": "node scripts/sync-core.mjs --check",
     "build": "tsc -p tsconfig.json",
-    "package:vsix": "npm run build && vsce package",
-    "check:types": "tsc --noEmit -p tsconfig.json"
+    "check:types": "tsc --noEmit -p tsconfig.json",
+    "test:extension-host": "npm run build && node scripts/test-extension-host.mjs",
+    "test:adapter": "npm run build && node --test test/*.test.mjs"
   },
   "dependencies": {
     "promela-language-core": "file:../../release/promela-language-core"
@@ -40,7 +44,6 @@
   "devDependencies": {
     "@types/vscode": "^1.100.0",
     "typescript": "5.9.3",
-    "@vscode/vsce": "^3.6.0",
     "@types/node": "22.15.0"
   },
   "publisher": "replace-with-your-publisher",

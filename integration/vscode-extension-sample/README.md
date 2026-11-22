@@ -1,66 +1,100 @@
-# VS Code adapter sample (Node.js extension host)
+# ProMeLa core — VS Code integration sample
 
-This is a **reference adapter**, not a modification of your existing extension.
-Do not publish it alongside an extension that already contributes the `promela`
-language ID; merge only its providers into that extension.
+This sample is a **reference adapter**. It does not replace your actual extension,
+its TextMate grammar, SPIN simulation/diagnostics, command registration or
+cancellation logic. The published language core has no `vscode` dependency.
 
-From the repository root:
+## Build and synchronization
 
-```bash
-npm install
-npm run release:core
+After the root project's `npm run test:all` succeeds:
+
+```sh
 cd integration/vscode-extension-sample
-npm install   # Run INSIDE this sample folder; root npm install is not enough
+npm install
+npm run sync:core
 npm run check:types
 npm run build
-npx @vscode/vsce ls --no-dependencies
 ```
 
-For a local extension development host, open this folder in VS Code and run
-`code --extensionDevelopmentPath=.` or use a standard extensionHost launch.json.
-For a .vsix, first install a **tarball** (not a symlinked local directory):
+`sync:core` stages the current compiled core, refreshes its `file:` package
+and checks that `createLanguageCore` and its declarations are available.
+Type checks and builds reject a stale installed dependency instead of hiding
+missing exports. Sample dependencies are **separate** from the root project.
 
-```bash
-cd ../../release/promela-language-core
-npm pack
-cd ../../integration/vscode-extension-sample
-npm install --save ../../release/promela-language-core/promela-language-core-0.3.5.tgz
-# Replace the sample `publisher` in package.json before public publication.
-npm run package:vsix
+## Default integration test: no VS Code download
+
+```sh
+npm run test:adapter
 ```
 
-Then inspect the `.vsix` with `unzip -l *.vsix`. This is an example
-workflow; no actual VSIX was built in the preparation environment.
+This runs a Node.js test against **the actual compiled DefinitionProvider and
+DocumentSymbolProvider** registered by the sample, with the actual staged
+ProMeLa WASM core, and a minimal mock of the VS Code API. It verifies F12,
+unsaved edits, symbols, cancellation, unresolved references and disposal.
+It does **not** start Electron, install VS Code, download any application, or
+claim to be a real VS Code Extension Host test.
 
-Before a production release:
-* Verify that VSIX contains `node_modules/promela-language-core/assets/tree-sitter-promela.wasm`,
-  core compiled JS, web-tree-sitter runtime JS and its WASM, and the notices.
-* Test in a real Extension Development Host: Ctrl+click a quoted relative #include path, a `goto` label, inline
-  call, macro reference, process call, variable, typedef field.
-* Do not use this sample for cross-file or preprocessed-source navigation.
-* `vscode`'s ESM support here needs Node extension host / VS Code >=1.100.
-  For older VS Code, bundle an appropriate CommonJS extension instead.
-* Keep the Node-only core separate from a potential browser adapter. For web
-  use Uint8Array loading through `vscode.workspace.fs`, not Node `fs` paths.
+The providers live in `src/providers.ts`, with a runtime-injected `vscode`
+argument (type-only `import type` dependency). `src/extension.ts` registers
+the *same* providers against the real VS Code module. There is no parallel
+implementation to drift from production behavior.
 
-## TypeScript type definitions
+## Optional real Extension Host test — use local VS Code
 
-This example explicitly lists `"types": ["node", "vscode"]` in its own
-`tsconfig.json`. Both `@types/node` and `@types/vscode` are **devDependencies of
-this sample**, not the repository root. If VS Code reports
-`Cannot find type definition file for 'vscode'`, run `npm install` in this
-`integration/vscode-extension-sample` directory (after staging the core), then
-run `npm run check:types`. Do not silence the compiler diagnostic: a sample
-should compile cleanly.
+Run only when you explicitly want to verify the real VS Code API:
 
-## TypeScript in a nested sample
+```sh
+npm run test:extension-host
+```
 
-This is a separate npm project. Run `npm install` **in this directory**
-(after staging the core), then `npm run check:types`. `@types/vscode`
-is a dev dependency and is resolved via `import * as vscode from 'vscode'`;
-it need not appear under `compilerOptions.types`. The sample explicitly
-includes Node globals with `"types": ["node"]`.
+This requires the installed **VS Code GUI/Electron executable**, not merely the `code` CLI wrapper. On standard Ubuntu installations, the runner resolves `/usr/bin/code` to `/usr/share/code/code` automatically. You may also pass an explicit executable path:
 
-When the CLI type check passes but VS Code still shows the old diagnostic,
-run **TypeScript: Restart TS Server** and then **Developer: Reload Window**.
-The IDE should not suppress diagnostics for this sample.
+```sh
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:extension-host
+```
+
+The runner launches the Electron application directly rather than using the CLI wrapper, which can exit before the test executes. It launches a **separate temporary user profile** to avoid interfering with
+your running editor. It makes no network requests and never downloads VS Code.
+If no local executable exists, it fails with a helpful message.
+
+The runner checks for an explicit success marker written **after** the actual
+Extension Host assertions have executed. A process exit code of zero on its
+own does not count as a passing test. Do not confuse unrelated warnings from
+VS Code's bundled GitHub/Copilot extensions with errors from this adapter.
+
+The real-host assertions check `vscode.executeDefinitionProvider` and F12
+after an unsaved editor edit. They are optional during development but should
+pass before declaring the production extension release-ready. The actual
+extension and packaged VSIX still require their **own** end-to-end testing,
+including preservation of SPIN and TextMate functionality.
+
+## Dependency security
+
+The reference sample no longer depends on `@vscode/test-electron` or
+`@vscode/vsce`, because no test download or sample publishing is necessary.
+The actual extension can own VSIX packaging. After updating this manifest,
+run `npm install` inside **this directory** to prune the old packages, then
+`npm audit` to inspect any advisories that remain. Do not blindly use
+`npm audit fix --force`.
+
+`@types/vscode` remains a development dependency for TypeScript checks. The
+project's `tsconfig.json` explicitly lists only `node` under `types` because
+`import 'vscode'` automatically loads the module declarations.
+
+### Optional host-test diagnostics
+
+If the test still fails, verify that the GUI executable exists:
+
+```sh
+ls -l /usr/share/code/code
+VSCODE_EXECUTABLE_PATH=/usr/share/code/code npm run test:extension-host
+```
+
+The installed VS Code must be able to start a graphical Electron window on
+your machine. This is a heavier **optional** acceptance test, not part of the
+fast `test:adapter` command. A dedicated process must complete the host
+assertions; exiting zero without a result marker is always a failure.
+
+`test:adapter` also runs small launcher-regression checks without starting VS
+Code, ensuring the runner distinguishes the GUI executable from the CLI
+wrapper and rejects false-positive exit codes.

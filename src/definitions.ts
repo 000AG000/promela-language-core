@@ -210,7 +210,7 @@ function isDeclaration(target: Node): boolean {
 }
 
 function choose(
-  symbols: Definition[],
+  symbols: readonly Definition[],
   name: string,
   kind: SymbolKind,
   scope: string,
@@ -219,10 +219,15 @@ function choose(
 }
 
 /** Resolve a cursor to a declaration, preferring parameters/process-local variables. */
-export function definitionAt(tree: Tree, row: number, column: number): Definition | undefined {
+export function definitionAt(
+  tree: Tree,
+  row: number,
+  column: number,
+  indexed?: readonly Definition[],
+): Definition | undefined {
   const node = tree.rootNode.descendantForPosition({ row, column });
   if (!node || !['uname', 'type'].includes(node.type)) return undefined;
-  const defs = indexDefinitions(tree);
+  const defs = indexed ?? indexDefinitions(tree);
   const localScope = nearestScope(node);
   const name = node.text;
   const own = defs.find((d) => d.startIndex === node.startIndex);

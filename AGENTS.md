@@ -67,3 +67,12 @@ and avoid automatic formatting that rewrites unrelated grammar code.
 - Avoid bulk formatting in functional patches. Prettier formatting is enforced in `check:quality`, the pre-commit hook and CI.
   Do not reformat the derived grammar or generated files.
 - Read `docs/TOOLING-v0.3.6.md` before changing tooling or hooks.
+
+## v0.4.0 P0 contract
+
+- Maintain `createLanguageCore` and the legacy `createPromelaParser`, `definitionAt`, `indexDefinitions` APIs simultaneously.
+- Public `SourcePosition.character` means UTF-16 code units; ranges have exclusive ends. Test emoji and CRLF before modifying coordinate logic.
+- Full-text document updates are P0; rejecting stale versions and freeing old trees are mandatory.
+- No `vscode` runtime dependency in the core; keep SPIN and TextMate in the extension.
+- Preserve `word: $ => $.uname` and the recovered top-level declaration regression.
+- See `docs/INTEGRATION-v0.4.0.md`; do not claim real-extension/VSIX acceptance until tested.

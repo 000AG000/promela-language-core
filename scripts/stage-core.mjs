@@ -18,7 +18,14 @@ mkdirSync(resolve(out, 'dist/src'), { recursive: true });
 mkdirSync(resolve(out, 'assets'), { recursive: true });
 mkdirSync(resolve(out, 'THIRD_PARTY_LICENSES'), { recursive: true });
 // Ship only modules reachable from the public index, not development CLI/audit tools.
-for (const moduleName of ['index', 'parser', 'definitions']) {
+for (const moduleName of [
+  'index',
+  'parser',
+  'definitions',
+  'language-core',
+  'source-text',
+  'semantic-index',
+]) {
   for (const suffix of ['.js', '.js.map', '.d.ts']) {
     const name = moduleName + suffix;
     copyFileSync(resolve(root, 'dist/src', name), resolve(out, 'dist/src', name));
@@ -61,7 +68,7 @@ writeFileSync(
   `# promela-language-core v${version}
 
 This npm package includes the ProMeLa WASM grammar and the TypeScript/JS
-symbol index. It is a Node.js module, not yet a VS Code web extension.
+shared symbol/reference index, batch semantic tokens, and a versioned editor-facing document API. It is a Node.js module, not a VS Code web extension.
 
 \`createPromelaParser()\` loads the packaged WASM using module-relative paths.
 The core web-tree-sitter runtime is provided by the runtime npm dependency.

@@ -1,8 +1,10 @@
-# ProMeLa Language Core — negative testing candidate v0.3.5
+# ProMeLa Language Core — v0.4.0 P0 integration candidate
+
+**New in 0.4.0-rc.2:** `createLanguageCore()` provides an editor-independent, versioned document lifecycle, UTF-16 source locations, single-file Go to Definition and document symbols. The existing parser API remains compatible. See [`docs/INTEGRATION-v0.4.0.md`](docs/INTEGRATION-v0.4.0.md) and [`docs/VERIFICATION-v0.4.0.md`](docs/VERIFICATION-v0.4.0.md). **This is a candidate, not yet validated in the real VS Code extension or installed VSIX.**
 
 A Node.js/TypeScript language-core prototype for [SPIN's ProMeLa language](https://spinroot.com/spin/Man/promela.html), powered by a maintained WebAssembly Tree-sitter grammar. The package is intended for a future **VS Code workspace extension**, but contains no `vscode` runtime dependency.
 
-**Status:** The project owner verified the **v0.3.4 baseline**: 34 Node tests, two Tree-sitter corpus cases, and independent installation of the packaged JS/WASM library all passed. **v0.3.5 adds negative syntax fixtures, parser error-recovery tests, native `:error` corpus cases, and a VS Code sample type-dependency fix; these new checks still require execution.** The grammar and runtime resolver are unchanged. There is no GitHub repository or public npm publication.
+**Baseline:** The project owner verified v0.3.6 with the recovery-word grammar change: 46 passing Node tests, five native corpus tests, a clean npm audit, and independent installed-package navigation. v0.4.0-rc.2 adds a new language-service API; its expanded tests and Extension Host integration require fresh verification. No public npm publication is claimed.
 
 ## Architecture at a glance
 
@@ -112,3 +114,15 @@ patch, run `npm install` to update the local lockfile, then
 `npm run doctor -- --strict`, `npm run check:quality`, and `npm run test:all`.
 CI requires a committed `package-lock.json` and uses `npm ci`. Prettier is
 configured but intentionally not enforced until a separate formatting commit.
+
+## v0.5.0 semantic tokens and references (release candidate)
+
+The document API now supports `getSemanticTokens(uri)` and
+`findReferences(uri, position, includeDeclaration)` using one shared semantic
+index per document version. The 250-candidate limit formerly applied by the
+reference extension is not part of the core. See
+[docs/INTEGRATION-v0.5.0.md](docs/INTEGRATION-v0.5.0.md).
+
+Build and verify with `npm run test:all`, measure with
+`npm run benchmark:semantic`, and generate a distributable npm tarball using
+`npm run pack:core` (requires installed npm dependencies and compiled WASM).

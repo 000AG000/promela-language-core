@@ -141,3 +141,18 @@ check:quality` includes TypeScript/grammar/static checks and ESLint. CI now
 uses `npm ci`, so a real, committed `package-lock.json` is required. The
 Prettier check is opt-in until a separately reviewed initial formatting pass.
 See `docs/TOOLING-v0.3.6.md` for migration commands.
+
+## v0.4.0 P0 integration tests
+
+`test/language-core.test.ts` asserts versioned snapshots, stale-update rejection, separate URI isolation, source coordinates (including UTF-16 emoji and CRLF), safe syntax errors, and definition resolution. `npm run test:all` runs it alongside the older suite and installs/tests a real tarball. See `docs/INTEGRATION-v0.4.0.md` for the optional VS Code Extension Host smoke test.
+
+## v0.5.0 semantic-index regressions
+
+`test/semantic-tokens.test.ts` verifies batch declarations/references,
+shadowing, inline definitions, typedef fields, labels, LTL, mtype, macros,
+no false tokens in comments/strings, UTF-16/CRLF, document invalidation,
+Find References and 2,000 resolved references without a candidate cap.
+
+Run `npm run benchmark:semantic` after building WASM to compare one batch call
+with 2,000 repeated `getDefinition()` calls. Benchmark timings depend on host
+hardware and are not hard-coded as pass/fail thresholds.

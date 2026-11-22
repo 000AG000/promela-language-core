@@ -7,19 +7,14 @@
 - The native Tree-sitter `grammar/test/corpus/invalid.txt` verifies three concrete `ERROR` parse shapes.
 - Incremental repair compares its syntax tree against an independent fresh parse of the **same** repaired source; the result must be syntax-error-free and preserve the intended label and goto.
 
-## Known recovery limitation
+## Recovered top-level declarations
 
-Given this source:
-
-```promela
-int before;
-$
-int after;
-```
-
-In the v0.3.5 grammar, Tree-sitter recognizes the first declaration and reports an error for `$`, but **does not expose the later declaration as a `one_decl`**. The suffix `int after;` parses correctly in isolation. The positive requirement to retain that later declaration is tracked as a `test.todo` and must not be silently represented as a passing recovery test.
-
-This is an editor-quality limitation. When implementing better top-level synchronization, add a corpus fixture and turn that TODO into an executable assertion. Do not make `$` valid syntax simply to allow recovery.
+The grammar now declares `word: $ => $.uname`. The project owner verified
+that an illegal `$` between `int before;` and `int after;` reports a syntax
+error **and** preserves the later declaration. The old `test.todo` is now
+an active regression test. Do not remove this test when changing keywords
+or precedence. This does not imply arbitrary malformed syntax can always
+be recovered.
 
 ## When to change tests
 

@@ -1,9 +1,9 @@
 {
   "name": "promela-tree-sitter-wasm-lab",
-  "version": "0.3.6",
+  "version": "0.5.0-rc.1",
   "private": true,
   "type": "module",
-  "description": "Self-contained ProMeLa Tree-sitter grammar and TypeScript WASM language-service prototype",
+  "description": "ProMeLa Tree-sitter grammar and editor-independent Node.js language core (v0.5.0 semantic index candidate)",
   "engines": {
     "node": ">=20.11"
   },
@@ -25,7 +25,7 @@
     "check:fast": "npm run check:grammar && tsc --noEmit -p tsconfig.json && node scripts/check-scripts.mjs && npm run test:tooling",
     "test:grammar": "node scripts/run-corpus.mjs",
     "test:unit": "node --test dist/test/*.test.js",
-    "test:package": "npm run stage:core && node scripts/test-package.mjs",
+    "test:package": "npm run stage:core && node scripts/test-package.mjs && node scripts/test-package-p0.mjs",
     "test:all": "npm test && npm run test:package",
     "hooks:install": "node scripts/install-hooks.mjs",
     "doctor": "node scripts/doctor.mjs",
@@ -36,18 +36,20 @@
     "format:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.mjs\"",
     "test:tooling": "node --test test-tools/*.test.mjs",
     "check:lock": "node scripts/check-lockfile.mjs",
-    "check:quality": "npm run check:fast && npm run lint && npm run format:check"
+    "check:quality": "npm run check:fast && npm run lint && npm run format:check",
+    "benchmark:semantic": "npm run check:wasm && npm run build && node benchmark/semantic-tokens.mjs",
+    "pack:core": "npm run stage:core && npm pack ./release/promela-language-core --pack-destination ./release"
   },
   "dependencies": {
     "web-tree-sitter": "0.27.2"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
     "@types/node": "22.15.0",
-    "eslint": "10.15.0",
-    "prettier": "3.6.2",
     "tree-sitter-cli": "0.27.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.73.0"
+    "@eslint/js": "10.0.1",
+    "eslint": "10.15.0",
+    "typescript-eslint": "8.73.0",
+    "prettier": "3.6.2"
   }
 }
