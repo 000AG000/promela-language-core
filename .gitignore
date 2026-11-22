@@ -9,3 +9,8 @@ vendor/
 release/
 *.tgz
 *.vsix
+
+# Patch and editor backup files
+*.orig
+*.rej
+*.bak
