@@ -32,22 +32,33 @@ example is to be built. It is excluded from root lint/format and CI for now.
 | `npm run test:tooling` | Run tests for lockfile-validation logic |
 | `npm run check:fast` | Grammar, TS types, script syntax, tooling unit tests |
 | `npm run lint` | ESLint 9 flat configuration for source, tests, and build scripts |
-| `npm run check:quality` | Fast checks plus lint |
+| `npm run check:quality` | Fast checks, lint, and formatting gate |
 | `npm run format:check` | Check existing maintained JS/TS source formatting |
 | `npm run format:write` | Apply Prettier to maintained JS/TS source |
 | `npm run test:all` | Full fresh WASM and installed-package suite |
 
 ## Formatting migration policy
 
-Prettier has been **configured, not auto-applied**. The current source contains
-pre-existing formatting choices. `format:check` may fail until its first
-one-time migration. To avoid an unrelated rewrite while reviewing this tooling
-change, DO NOT add `format:check` to commit hooks or CI yet.
+The initial formatting pass is **a distinct commit from the gate update**.
 
-When ready, create a dedicated commit that runs `npm run format:write`,
-review the resulting diff, rerun `npm run test:all`, and then enable
-`format:check` in CI and pre-commit hooks. The grammar DSL in `grammar/grammar.js`
-is intentionally excluded from this first formatting pass.
+1. On the committed v0.3.6 baseline, run `npm run format:write` at the root.
+   This formats maintained TypeScript and build scripts (not the derived
+   `grammar/` sources, tooling tests, fixtures, the integration sample, or
+   generated files).
+2. Run `git diff --check`, `npm run format:check`, `npm run check:quality`,
+   `npm run test:all` and review `git diff --stat` and `git diff`.
+3. Commit the resulting formatting-only changes, e.g.
+   `git commit -am "style: establish Prettier baseline"`. Include only reviewed
+   files; Git ignores generated output.
+4. Apply the `format-gate` patch, which makes `check:quality` include
+   `format:check`. CI and the tracked pre-commit hook already run
+   `check:quality`, so the gate is enforced in both places.
+5. Run `npm run check:quality && npm run test:all`, then commit the gate as a
+   second change, e.g. `git commit -am "chore: enforce Prettier formatting"`.
+
+If a previous pre-commit hook blocks the first formatting commit, run and
+review `npm run format:check`; only bypass the hook when absolutely necessary.
+The gate runs on the entire maintained-source set, not just staged files.
 
 ESLint is active in CI. `npm run lint` needs to be run once with the real npm
 dependencies; correct genuine violations, but do not disable the checks just to
@@ -64,7 +75,7 @@ quality checks, tests the grammar/WASM/runtime/installed npm tarball, and audits
 language-feature support.
 
 Install tracked hooks only if desired with `npm run hooks:install`. Pre-commit
-runs `check:quality`, pre-push runs `test:all`. GitHub is not required for local
+runs `check:quality` (including formatting), pre-push runs `test:all`. GitHub is not required for local
 Git use. No npm or VSIX publication happens in these commands.
 
 ## What remains outside this milestone
@@ -72,5 +83,5 @@ Git use. No npm or VSIX publication happens in these commands.
 - Real extension-host/VSIX tests.
 - Full SPIN language conformance and preprocessing semantics.
 - Benchmark and UTF-16/CRLF navigation tests.
-- Full formatting migration and enforcement.
+- Additional formatting for documentation or the separate VS Code sample, if desired.
 - Actual dependency security review (especially VS Code sample dev tooling).

@@ -1,5 +1,5 @@
 #!/bin/sh
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-printf '%s\n' '[pre-commit] ProMeLa grammar/type/script/lint checks'
+printf '%s\n' '[pre-commit] ProMeLa grammar, TypeScript, lint and format checks'
 npm run check:quality

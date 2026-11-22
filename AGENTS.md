@@ -64,6 +64,6 @@ and avoid automatic formatting that rewrites unrelated grammar code.
 - `npm run test:all` is still mandatory before release and covers the tarball.
 - Generate a real root `package-lock.json` using `npm install`, commit it, and
   use `npm ci` in CI; do not fabricate registry-resolved integrity values.
-- Avoid bulk formatting in functional patches. The first Prettier formatting
-  pass must be an independent commit; only then enforce `format:check` in CI.
+- Avoid bulk formatting in functional patches. Prettier formatting is enforced in `check:quality`, the pre-commit hook and CI.
+  Do not reformat the derived grammar or generated files.
 - Read `docs/TOOLING-v0.3.6.md` before changing tooling or hooks.

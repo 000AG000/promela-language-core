@@ -36,7 +36,7 @@
     "format:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"scripts/**/*.mjs\"",
     "test:tooling": "node --test test-tools/*.test.mjs",
     "check:lock": "node scripts/check-lockfile.mjs",
-    "check:quality": "npm run check:fast && npm run lint"
+    "check:quality": "npm run check:fast && npm run lint && npm run format:check"
   },
   "dependencies": {
     "web-tree-sitter": "0.27.2"
