@@ -1,5 +1,8 @@
 # Pre-publication review — v0.3.1 baseline → v0.3.2 maintenance candidate
 
+> **Historical document (v0.3.1 → v0.3.2).** This is an archived pre-publication assessment, not the current project status or release checklist. The project has since reached `0.5.0-rc.1`, has a public [GitHub repository](https://github.com/000AG000/promela-language-core), a committed lockfile, enforced quality checks, and a tested independent npm package. For the current capabilities, limitations and release procedure, use the [README](../README.md) and [v0.5.0 integration notes](INTEGRATION-v0.5.0.md).
+
+
 This review is based on the actual v0.3.1 source archive and the owner's
 successful local test log. It is not a certification of full SPIN compatibility.
 
