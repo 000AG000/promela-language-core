@@ -4,6 +4,9 @@
 // Syntax compatibility is deliberately limited; see docs/COMPATIBILITY.md.
 module.exports = grammar({
   name: 'promela',
+  // EXPERIMENT: keyword extraction may improve error recovery after junk.
+  // Verify with the dedicated regression test before merging this change.
+  word: $ => $.uname,
   // Keep raw preprocessor directives in the source tree without pretending to expand them.
   // This is a syntactic source view, not SPIN's preprocessed translation unit.
   extras: $ => [/\s/, $.comment, $.preprocessor_directive],

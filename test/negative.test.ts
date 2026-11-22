@@ -91,10 +91,28 @@ test('reports an unexpected top-level token without losing earlier declarations'
   }
 });
 
-// Pending grammar improvement: in v0.3.5 an unexpected '$' between two
-// top-level declarations consumes the later declaration during recovery.
-// Keep this visible; do not quietly classify the later declaration as invalid.
-test.todo('known grammar gap: retain later declarations after illegal top-level token');
+// Recovery regression: the illegal '$' must stay an error while 'after'
+// must survive as a normal top-level declaration, not a child of ERROR.
+test('recovers a top-level declaration after an illegal token', async () => {
+  const runtime = await runtimePromise;
+  const tree = runtime.parse('int before;\n$\nint after;');
+  try {
+    assert.equal(tree.rootNode.type, 'program');
+    assertSyntax(tree.rootNode, 'invalid', 'illegal top-level token must remain invalid');
+    const declarations = tree.rootNode.descendantsOfType('one_decl');
+    const before = declarations.find((node) => node.text.includes('before'));
+    const after = declarations.find(
+      (node) =>
+        node.text.includes('after') &&
+        node.startPosition.row === 2 &&
+        node.parent?.type === 'program',
+    );
+    assert.ok(before, `Lost declaration before error: ${tree.rootNode}`);
+    assert.ok(after, `After was not recovered as a top-level declaration: ${tree.rootNode}`);
+  } finally {
+    tree.delete();
+  }
+});
 
 test('incremental reparse repairs an invalid token and clears syntax errors', async () => {
   const runtime = await runtimePromise;
