@@ -1,0 +1,7 @@
+* text=auto
+*.wasm binary
+*.png binary
+*.tgz binary
+*.vsix binary
+*.pml text eol=lf
+*.scm text eol=lf

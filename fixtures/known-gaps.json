@@ -1,0 +1,12 @@
+[
+  {
+    "name": "embedded-c",
+    "source": "c_code { int x = 1; };\n",
+    "reason": "C-related rules are commented out"
+  },
+  {
+    "name": "preprocessor-multiline-macro",
+    "source": "#define CHECK(x) \\\n    assert(x)\ninit { CHECK(1); }",
+    "reason": "Continuation lines and macro expansion are not yet modeled"
+  }
+]

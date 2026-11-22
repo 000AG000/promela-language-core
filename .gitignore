@@ -1,0 +1,11 @@
+node_modules/
+dist/
+assets/*.wasm
+assets/*.sha256
+grammar/src/
+.DS_Store
+vendor/
+
+release/
+*.tgz
+*.vsix

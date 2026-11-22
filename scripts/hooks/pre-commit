@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+printf '%s\n' '[pre-commit] ProMeLa fast grammar/type/script checks'
+npm run check:fast

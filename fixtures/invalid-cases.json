@@ -1,0 +1,37 @@
+[
+  {
+    "name": "unclosed-process-parameters",
+    "source": "active proctype Worker( { skip; }",
+    "reason": "The parameter list is missing its closing parenthesis."
+  },
+  {
+    "name": "unclosed-init-body",
+    "source": "init { skip",
+    "reason": "The init block is missing its closing brace."
+  },
+  {
+    "name": "goto-without-target",
+    "source": "init { goto ; }",
+    "reason": "A goto statement requires a label name."
+  },
+  {
+    "name": "assignment-without-value",
+    "source": "int count; init { count = ; }",
+    "reason": "Assignment requires a right-hand-side expression."
+  },
+  {
+    "name": "declaration-without-name",
+    "source": "init { byte ; skip; }",
+    "reason": "A byte declaration requires a variable name."
+  },
+  {
+    "name": "unclosed-ltl-expression",
+    "source": "ltl broken { [] (",
+    "reason": "The LTL expression is missing its closing delimiters and operand."
+  },
+  {
+    "name": "channel-without-element-type",
+    "source": "chan q = [2] of { };",
+    "reason": "The channel initializer requires at least one message type."
+  }
+]

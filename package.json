@@ -1,0 +1,43 @@
+{
+  "name": "promela-tree-sitter-wasm-lab",
+  "version": "0.3.5.1",
+  "private": true,
+  "type": "module",
+  "description": "Self-contained ProMeLa Tree-sitter grammar and TypeScript WASM language-service prototype",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "check:grammar": "node scripts/check-grammar.mjs",
+    "generate": "npm run check:grammar && node scripts/generate.mjs",
+    "build:wasm": "npm run generate && node scripts/build-wasm.mjs",
+    "build": "tsc -p tsconfig.json",
+    "setup": "npm test",
+    "test": "npm run build:wasm && npm run build && npm run test:grammar && npm run test:unit",
+    "parse": "npm run check:wasm && node dist/src/cli.js",
+    "audit": "npm run check:wasm && npm run build && node dist/src/audit.js",
+    "audit:strict": "npm run check:wasm && npm run build && node dist/src/audit.js --strict",
+    "fetch:upstream-examples": "node scripts/fetch-upstream-examples.mjs",
+    "check:wasm": "node scripts/check-wasm.mjs",
+    "test:compiled": "npm run check:wasm && npm run build && node --test dist/test/*.test.js",
+    "stage:core": "npm run check:wasm && npm run build && node scripts/stage-core.mjs",
+    "release:core": "npm test && node scripts/stage-core.mjs",
+    "check:fast": "npm run check:grammar && tsc --noEmit -p tsconfig.json && node scripts/check-scripts.mjs",
+    "test:grammar": "node scripts/run-corpus.mjs",
+    "test:unit": "node --test dist/test/*.test.js",
+    "test:package": "npm run stage:core && node scripts/test-package.mjs",
+    "test:all": "npm test && npm run test:package",
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "test:coverage": "npm run build:wasm && npm run build && node --experimental-test-coverage --test dist/test/*.test.js",
+    "test:negative": "npm run check:wasm && npm run build && node --test dist/test/negative.test.js"
+  },
+  "dependencies": {
+    "web-tree-sitter": "0.27.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.0",
+    "tree-sitter-cli": "0.27.2",
+    "typescript": "5.9.3"
+  }
+}

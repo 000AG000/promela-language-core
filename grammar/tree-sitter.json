@@ -1,0 +1,19 @@
+{
+  "grammars": [
+    {
+      "name": "promela",
+      "camelcase": "Promela",
+      "scope": "source.promela",
+      "path": ".",
+      "file-types": ["pml"],
+      "highlights": ["queries/highlights.scm"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "ProMeLa parser used for WebAssembly language-service experiments",
+    "authors": [{"name": "Ben Siraphob (original grammar)"}]
+  },
+  "bindings": {}
+}

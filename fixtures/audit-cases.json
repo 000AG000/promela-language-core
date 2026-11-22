@@ -1,0 +1,77 @@
+[
+  {
+    "name": "global-variable",
+    "source": "int count; init { count = 1; }",
+    "expectedValid": true
+  },
+  {
+    "name": "proctype-with-argument",
+    "source": "active proctype Ping(byte x) { x = 1; } init { run Ping(2); }",
+    "expectedValid": true
+  },
+  {
+    "name": "channels",
+    "source": "chan q = [2] of {byte}; init { byte x; q ! 1; q ? x; }",
+    "expectedValid": true
+  },
+  {
+    "name": "ltl-property",
+    "source": "int x; ltl p { [] (x >= 0) }",
+    "expectedValid": true
+  },
+  {
+    "name": "user-defined-type",
+    "source": "typedef Packet { byte id }; Packet p; init { p.id = 2; }",
+    "expectedValid": true
+  },
+  {
+    "name": "goto-label",
+    "source": "init { goto end; end: skip }",
+    "expectedValid": true
+  },
+  {
+    "name": "inline-definition",
+    "source": "inline inc(x) { x = x + 1; } init { int n; inc(n); }",
+    "expectedValid": true
+  },
+  {
+    "name": "preprocessor",
+    "source": "#define N 2\nint x = N;",
+    "expectedValid": true
+  },
+  {
+    "name": "embedded-c",
+    "source": "init { c_code { int x = 1; }; }",
+    "expectedValid": true
+  },
+  {
+    "name": "unsigned",
+    "source": "unsigned bits : 4;",
+    "expectedValid": true
+  },
+  {
+    "name": "guarded-option-assignment",
+    "source": "byte n; init { if :: n > 0 -> n = n - 1; :: else -> skip; fi; }",
+    "expectedValid": true
+  },
+  {
+    "name": "ltl-temporal-implication",
+    "source": "int a; int b; ltl p { [] ((a > 0) -> (b > 0)) }",
+    "expectedValid": true
+  },
+  {
+    "name": "labeled-statement-and-goto",
+    "source": "init { goto finished; finished: skip }",
+    "expectedValid": true
+  },
+  {
+    "name": "unsigned-initializer",
+    "source": "unsigned flags : 5 = 15; init { flags = 3; }",
+    "expectedValid": true
+  },
+  {
+    "name": "preprocessor-conditional",
+    "source": "#if FOO\nint a;\n#else\nbyte a;\n#endif\ninit { a = 1; }",
+    "expectedValid": true
+  }
+]

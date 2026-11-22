@@ -1,0 +1,48 @@
+{
+  "name": "promela-core-vscode-sample",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Development-only ProMeLa VS Code adapter; integrate into your existing extension rather than publishing alongside it.",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:promela"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "promela",
+        "extensions": [
+          ".pml"
+        ],
+        "aliases": [
+          "Promela",
+          "ProMeLa"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "package:vsix": "npm run build && vsce package",
+    "check:types": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "promela-language-core": "file:../../release/promela-language-core"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.0",
+    "typescript": "5.9.3",
+    "@vscode/vsce": "^3.6.0",
+    "@types/node": "22.15.0"
+  },
+  "publisher": "replace-with-your-publisher",
+  "license": "MIT"
+}
