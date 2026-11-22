@@ -11,7 +11,9 @@ try {
     throw new Error('Please initialize Git in this project root, not a parent folder.');
   }
 } catch (error) {
-  throw new Error(`Git repository required. Run 'git init -b main' first. ${error.message}`);
+  throw new Error(`Git repository required. Run 'git init -b main' first. ${error.message}`, {
+    cause: error,
+  });
 }
 // Explicit opt-in: no hooks are installed automatically by npm install.
 execFileSync('git', ['config', '--local', 'core.hooksPath', 'scripts/hooks'], {

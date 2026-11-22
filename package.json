@@ -42,12 +42,12 @@
     "web-tree-sitter": "0.27.2"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@types/node": "22.15.0",
+    "eslint": "10.15.0",
+    "prettier": "3.6.2",
     "tree-sitter-cli": "0.27.2",
     "typescript": "5.9.3",
-    "@eslint/js": "9.39.1",
-    "eslint": "9.39.1",
-    "typescript-eslint": "8.46.0",
-    "prettier": "3.6.2"
+    "typescript-eslint": "8.73.0"
   }
 }
